@@ -1,33 +1,74 @@
-<div class="container mx-auto p-6">
-  <div class="hero bg-gradient-to-r from-accent to-info text-accent-content rounded-lg mb-6">
-    <div class="hero-content text-center">
-      <div class="max-w-md">
-        <h1 class="mb-5 text-5xl font-bold">📈 Tendencias</h1>
-        <p class="mb-5">Las películas más populares y comentadas del momento</p>
+<!-- Página principal de películas en cartelera -->
+<div class="flex">
+  <!-- Sidebar (ya incluido en el layout padre) -->
+
+  <!-- Contenido principal -->
+  <div class="flex-1">
+    <!-- Encabezado de la página -->
+    <div class="p-8">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Películas en Tendencias</h1>
+          <p class="text-gray-600">Descubre las últimas películas que son tendencia</p>
+        </div>
+
+        <!-- Toggle para cambiar entre día y semana -->
+        <div class="flex items-center gap-4">
+          <span class="text-sm font-medium">Período:</span>
+          <div class="join">
+            <button
+              class="btn join-item border-none"
+              [class.btn-primary]="timeWindow() === 'day'"
+              [class.btn-outline]="timeWindow() !== 'day'"
+              (click)="timeWindow() !== 'day' && toggleTimeWindow()">
+              Día
+            </button>
+            <button
+              class="btn join-item border-none"
+              [class.btn-primary]="timeWindow() === 'week'"
+              [class.btn-outline]="timeWindow() !== 'week'"
+              (click)="timeWindow() !== 'week' && toggleTimeWindow()">
+              Semana
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title">🔥 Trending Hoy</h2>
-        <p>Las películas más populares de las últimas 24 horas</p>
-      </div>
-    </div>
-    
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title">📊 Top Semanal</h2>
-        <p>Las películas más vistas esta semana</p>
-      </div>
-    </div>
-    
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title">💬 Más Comentadas</h2>
-        <p>Películas que generan más conversación</p>
-      </div>
+
+    <!-- Contenedor principal del grid de películas -->
+    <div class="px-8 pb-8">
+      <!-- Estado de carga -->
+      @if (isLoading()) {
+        <div class="flex justify-center flex-col items-center h-full py-12">
+          <!-- Spinner de carga usando DaisyUI -->
+          <span class="loading loading-spinner loading-xl text-secondary"></span>
+          <p class="mt-4">Cargando películas en tendencia...</p>
+        </div>
+      }
+
+      <!-- Grid de películas (solo se muestra si hay datos y no está cargando) -->
+      @if (!isLoading() && movies().length > 0) {
+        <!-- Grid responsive que se adapta a diferentes tamaños de pantalla -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <!-- Itera sobre las películas usando @for -->
+        @for (movie of movies(); track movie.id) {
+          <!-- Cada tarjeta de película en tendencia -->
+          <app-movie-card
+            [movie]="movie"
+            [showPlayButton]="shouldShowPlayButton(movie)"
+            [showIcons]="shouldShowIcons(movie)">
+          </app-movie-card>
+        }
+        </div>
+      }
+
+      <!-- Estado de error -->
+      @if (hasError()) {
+        <!-- Alert de error usando DaisyUI -->
+        <div role="alert" class="alert alert-error alert-soft text-center justify-center flex-1">
+          <span class="text-base">{{ hasError() }}</span>
+        </div>
+      }
     </div>
   </div>
 </div>

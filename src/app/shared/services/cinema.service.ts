@@ -28,6 +28,7 @@ export class CinemaService {
   // Estado reactivo para la paginación
   nowPlayingPage = signal<number>(1);
   upcomingPage = signal<number>(1);
+  trendingTimeWindow = signal<'day' | 'week'>('day');
 
   // Estado reactivo para los géneros (cargados una vez y reutilizados)
   genres = signal<Genre[]>([]);
@@ -143,6 +144,40 @@ export class CinemaService {
         catchError((error) => {
           console.error(error);
           return throwError(() => new Error('No se pudo obtener las películas próximas'));
+        })
+      );
+  }
+
+  /**
+   * Obtiene las películas en tendencia (día o semana)
+   *
+   * @param timeWindow - Período de tiempo: 'day' para día, 'week' para semana
+   * @returns Observable con la lista de películas en tendencia transformadas
+   */
+  getTrending(timeWindow?: 'day' | 'week'): Observable<Movie[]> {
+    const period = timeWindow ?? this.trendingTimeWindow();
+    const url = `${environment.apiUrl}/trending/movie/${period}`;
+
+    // Headers con token de autorización
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${environment.token}`);
+
+    // Parámetros: idioma localizado
+    const params = new HttpParams()
+      .set('language', 'es-MX');
+
+    return this.http.get<RESTNowPlaying>(url, { headers, params })
+      .pipe(
+        // Actualiza el estado del período de tiempo actual
+        tap(() => this.trendingTimeWindow.set(period)),
+        // Simula delay para mostrar loading (solo para demo)
+        delay(1000),
+        // Transforma las películas usando el mapper
+        map((response) => MovieMapper.mapTMDBMoviesToMovies(response.results)),
+        // Manejo de errores
+        catchError((error) => {
+          console.error(error);
+          return throwError(() => new Error('No se pudo obtener las películas en tendencia'));
         })
       );
   }
