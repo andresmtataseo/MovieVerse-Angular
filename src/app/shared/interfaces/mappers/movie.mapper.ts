@@ -23,8 +23,10 @@ export class MovieMapper {
     return {
       id: TMDBmovie.id,
       title: TMDBmovie.title,
-      // Construye la URL completa del poster usando la configuración
-      posterUrl: `${environment.imageUrl}${TMDBmovie.poster_path}`,
+      // Construye la URL completa del poster o usa una imagen placeholder si es null
+      posterUrl: TMDBmovie.poster_path
+        ? `${environment.imageUrl}${TMDBmovie.poster_path}`
+        : '/placeholder-movie.svg',
       rating: TMDBmovie.vote_average,
       genres: TMDBmovie.genre_ids,
       // Extrae solo el año de la fecha de lanzamiento

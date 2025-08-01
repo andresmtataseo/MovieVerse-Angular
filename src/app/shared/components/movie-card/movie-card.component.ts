@@ -64,4 +64,14 @@ export class MovieCardComponent {
       empty: emptyStars
     };
   }
+
+  /**
+   * Maneja el error de carga de imagen y establece una imagen placeholder
+   *
+   * @param event - Evento de error de la imagen
+   */
+  onImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.src = '/placeholder-movie.svg';
+  }
 }

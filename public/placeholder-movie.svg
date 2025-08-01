@@ -1,0 +1,29 @@
+<svg width="300" height="450" viewBox="0 0 300 450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo gris -->
+  <rect width="300" height="450" fill="#374151"/>
+  
+  <!-- Icono de película -->
+  <g transform="translate(125, 175)">
+    <!-- Cámara de cine -->
+    <rect x="0" y="20" width="50" height="35" rx="5" fill="#6B7280"/>
+    <!-- Lente -->
+    <circle cx="25" cy="37.5" r="12" fill="#9CA3AF"/>
+    <circle cx="25" cy="37.5" r="8" fill="#4B5563"/>
+    <!-- Rollo de película -->
+    <circle cx="10" cy="10" r="8" fill="#9CA3AF"/>
+    <circle cx="40" cy="10" r="8" fill="#9CA3AF"/>
+    <!-- Líneas de película -->
+    <rect x="5" y="8" width="2" height="4" fill="#4B5563"/>
+    <rect x="13" y="8" width="2" height="4" fill="#4B5563"/>
+    <rect x="35" y="8" width="2" height="4" fill="#4B5563"/>
+    <rect x="43" y="8" width="2" height="4" fill="#4B5563"/>
+  </g>
+  
+  <!-- Texto -->
+  <text x="150" y="280" text-anchor="middle" fill="#9CA3AF" font-family="Arial, sans-serif" font-size="14" font-weight="500">
+    Sin imagen
+  </text>
+  <text x="150" y="300" text-anchor="middle" fill="#6B7280" font-family="Arial, sans-serif" font-size="12">
+    disponible
+  </text>
+</svg>

@@ -32,14 +32,14 @@ export interface Dates {
  */
 export interface TMDBMovie {
   adult:             boolean;   // Indica si es contenido para adultos
-  backdrop_path:     string;    // Ruta del fondo (sin URL base)
+  backdrop_path:     string | null;    // Ruta del fondo (sin URL base)
   genre_ids:         number[];  // IDs de géneros
   id:                number;    // ID único de TMDB
   original_language: string;    // Idioma original
   original_title:    string;    // Título original
   overview:          string;    // Sinopsis
   popularity:        number;    // Índice de popularidad
-  poster_path:       string;    // Ruta del poster (sin URL base)
+  poster_path:       string | null;    // Ruta del poster (sin URL base) - puede ser null
   release_date:      Date;      // Fecha de lanzamiento
   title:             string;    // Título localizado
   video:             boolean;   // Indica si es un video

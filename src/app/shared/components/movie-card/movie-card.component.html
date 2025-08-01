@@ -6,6 +6,7 @@
       [src]="movie().posterUrl"
       [alt]="movie().title"
       class="w-full h-96 object-cover"
+      (error)="onImageError($event)"
     >
 
     <!-- Badge de calificación (posición absoluta en la esquina superior derecha) -->
