@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MovieCardComponent } from '../shared/components/movie-card/movie-card.component';
+import { PaginationComponent } from '../shared/components/pagination/pagination.component';
 import { CinemaService } from '../shared/services/cinema.service';
 import { Movie } from '../shared/interfaces/movie.interface';
 import { forkJoin } from 'rxjs';
@@ -7,7 +8,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-upcoming',
   standalone: true,
-  imports: [MovieCardComponent],
+  imports: [MovieCardComponent, PaginationComponent],
   templateUrl: './upcoming.component.html',
   styleUrl: './upcoming.component.css'
 })
@@ -16,6 +17,8 @@ export class UpcomingComponent implements OnInit {
   movies = signal<Movie[]>([]);           // Lista de películas próximas
   isLoading = signal<boolean>(true);      // Estado de carga
   hasError = signal<string>('');          // Mensaje de error
+  currentPage = signal<number>(1);        // Página actual
+  totalPages = signal<number>(1);         // Total de páginas
 
   // Inyección del servicio principal de cinema
   private cinemaService = inject(CinemaService);
@@ -34,18 +37,21 @@ export class UpcomingComponent implements OnInit {
    * Carga géneros y películas próximas simultáneamente
    * Esto asegura que los géneros estén disponibles cuando se rendericen las movie-cards
    */
-  loadData(): void {
+  loadData(page?: number): void {
     this.isLoading.set(true);
+    this.hasError.set('');
     
     // Cargar géneros y películas próximas al mismo tiempo
     forkJoin({
       genres: this.cinemaService.getGenres(),
-      movies: this.cinemaService.getUpcoming()
+      movies: this.cinemaService.getUpcoming(page)
     }).subscribe({
       next: (data) => {
         console.log('Géneros cargados:', data.genres);
         console.log('Películas próximas cargadas:', data.movies);
         this.movies.set(data.movies);
+        this.currentPage.set(this.cinemaService.upcomingPage());
+        this.totalPages.set(this.cinemaService.upcomingTotalPages());
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -54,6 +60,15 @@ export class UpcomingComponent implements OnInit {
         this.hasError.set(error.message || 'Error al cargar los datos');
       }
     });
+  }
+
+  /**
+   * Maneja el cambio de página
+   */
+  onPageChange(page: number): void {
+    this.loadData(page);
+    // Scroll hacia arriba para mejor UX
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /**

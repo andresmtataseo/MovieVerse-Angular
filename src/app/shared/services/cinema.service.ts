@@ -29,7 +29,13 @@ export class CinemaService {
   // Estado reactivo para la paginación
   nowPlayingPage = signal<number>(1);
   upcomingPage = signal<number>(1);
+  trendingPage = signal<number>(1);
   trendingTimeWindow = signal<'day' | 'week'>('day');
+
+  // Estado reactivo para el total de páginas
+  nowPlayingTotalPages = signal<number>(1);
+  upcomingTotalPages = signal<number>(1);
+  trendingTotalPages = signal<number>(1);
 
   // Estado reactivo para los géneros (cargados una vez y reutilizados)
   genres = signal<Genre[]>([]);
@@ -100,8 +106,11 @@ export class CinemaService {
 
     return this.http.get<RESTNowPlaying>(url, { headers, params })
       .pipe(
-        // Actualiza el estado de la página actual
-        tap((response) => this.nowPlayingPage.set(response.page)),
+        // Actualiza el estado de la página actual y total de páginas
+        tap((response) => {
+          this.nowPlayingPage.set(response.page);
+          this.nowPlayingTotalPages.set(response.total_pages);
+        }),
         // Simula delay para mostrar loading (solo para demo)
         delay(1000),
         // Transforma las películas usando el mapper
@@ -135,8 +144,11 @@ export class CinemaService {
 
     return this.http.get<RESTNowPlaying>(url, { headers, params })
       .pipe(
-        // Actualiza el estado de la página actual
-        tap((response) => this.upcomingPage.set(response.page)),
+        // Actualiza el estado de la página actual y total de páginas
+        tap((response) => {
+          this.upcomingPage.set(response.page);
+          this.upcomingTotalPages.set(response.total_pages);
+        }),
         // Simula delay para mostrar loading (solo para demo)
         delay(1000),
         // Transforma las películas usando el mapper
@@ -152,21 +164,27 @@ export class CinemaService {
   /**
    * Obtiene las películas en tendencia (diarias o semanales)
    * @param timeWindow - 'day' para tendencias diarias, 'week' para semanales
+   * @param page - Número de página (opcional, usa el estado por defecto)
    * @returns Observable con las películas en tendencia
    */
-  getTrending(timeWindow: 'day' | 'week' = 'day'): Observable<Movie[]> {
+  getTrending(timeWindow: 'day' | 'week' = 'day', page?: number): Observable<Movie[]> {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${environment.token}`,
       'accept': 'application/json'
     });
 
     const params = new HttpParams()
-      .set('language', 'es-MX');
+      .set('language', 'es-MX')
+      .set('page', page ?? this.trendingPage());
 
     return this.http.get<RESTNowPlaying>(`${environment.apiUrl}/trending/movie/${timeWindow}`, { headers, params })
       .pipe(
         delay(1000), // Delay para demostración
-        tap(() => this.trendingTimeWindow.set(timeWindow)),
+        tap((response) => {
+          this.trendingTimeWindow.set(timeWindow);
+          this.trendingPage.set(response.page);
+          this.trendingTotalPages.set(response.total_pages);
+        }),
         map(response => response.results.map(movie => MovieMapper.mapTMDBMovieToMovie(movie))),
         catchError(error => {
           console.error('Error al obtener películas en tendencia:', error);

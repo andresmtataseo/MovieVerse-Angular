@@ -1,0 +1,62 @@
+<!-- Componente de paginación usando DaisyUI -->
+<div class="flex justify-center mt-8">
+  <div class="join">
+    <!-- Botón Primera Página -->
+    @if (shouldShowFirstPage()) {
+      <button 
+        class="join-item btn btn-sm"
+        [class.btn-disabled]="isLoading"
+        (click)="goToPage(1)">
+        1
+      </button>
+      <button class="join-item btn btn-sm btn-disabled">...</button>
+    }
+
+    <!-- Botón Página Anterior -->
+    <button 
+      class="join-item btn btn-sm"
+      [class.btn-disabled]="currentPage <= 1 || isLoading"
+      (click)="goToPreviousPage()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <!-- Números de Página -->
+    @for (page of getPageNumbers(); track page) {
+      <button 
+        class="join-item btn btn-sm"
+        [class.btn-active]="page === currentPage"
+        [class.btn-disabled]="isLoading"
+        (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    }
+
+    <!-- Botón Página Siguiente -->
+    <button 
+      class="join-item btn btn-sm"
+      [class.btn-disabled]="currentPage >= totalPages || isLoading"
+      (click)="goToNextPage()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+    <!-- Botón Última Página -->
+    @if (shouldShowLastPage()) {
+      <button class="join-item btn btn-sm btn-disabled">...</button>
+      <button 
+        class="join-item btn btn-sm"
+        [class.btn-disabled]="isLoading"
+        (click)="goToPage(totalPages)">
+        {{ totalPages }}
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Información de página actual -->
+<div class="text-center mt-4 text-sm text-gray-600">
+  Página {{ currentPage }} de {{ totalPages }}
+</div>

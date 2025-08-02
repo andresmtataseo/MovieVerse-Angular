@@ -60,6 +60,14 @@
           </app-movie-card>
         }
         </div>
+
+        <!-- Componente de paginación -->
+        <app-pagination 
+          [currentPage]="currentPage()"
+          [totalPages]="totalPages()"
+          [isLoading]="isLoading()"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       }
 
       <!-- Estado de error -->

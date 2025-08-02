@@ -31,6 +31,14 @@
           <app-movie-card [movie]="movie" [routerLink]="['/cinema/movie', movie.id]"></app-movie-card>
         }
         </div>
+
+        <!-- Componente de paginación -->
+        <app-pagination 
+          [currentPage]="currentPage()"
+          [totalPages]="totalPages()"
+          [isLoading]="isLoading()"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       }
 
       <!-- Estado de error -->

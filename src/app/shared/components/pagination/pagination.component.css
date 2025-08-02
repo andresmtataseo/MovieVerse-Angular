@@ -1,0 +1,15 @@
+/* Estilos adicionales para el componente de paginación */
+.join-item.btn:hover:not(.btn-disabled) {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+.join-item.btn.btn-active {
+  background-color: var(--fallback-p, oklch(var(--p)));
+  color: var(--fallback-pc, oklch(var(--pc)));
+}
+
+.join-item.btn.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

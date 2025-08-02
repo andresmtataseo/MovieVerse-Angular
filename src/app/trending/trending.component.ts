@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MovieCardComponent } from '../shared/components/movie-card/movie-card.component';
+import { PaginationComponent } from '../shared/components/pagination/pagination.component';
 import { CinemaService } from '../shared/services/cinema.service';
 import { Movie } from '../shared/interfaces/movie.interface';
 import { forkJoin } from 'rxjs';
@@ -7,7 +8,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-trending',
   standalone: true,
-  imports: [MovieCardComponent],
+  imports: [MovieCardComponent, PaginationComponent],
   templateUrl: './trending.component.html',
   styleUrl: './trending.component.css'
 })
@@ -17,6 +18,8 @@ export class TrendingComponent implements OnInit {
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
   timeWindow = signal<'day' | 'week'>('day');
+  currentPage = signal<number>(1);        // Página actual
+  totalPages = signal<number>(1);         // Total de páginas
 
   // Inyección del servicio de cinema
   private cinemaService = inject(CinemaService);
@@ -29,16 +32,18 @@ export class TrendingComponent implements OnInit {
    * Carga los datos necesarios: géneros y películas en tendencia
    * Usa forkJoin para cargar ambos simultáneamente
    */
-  private loadData(): void {
+  private loadData(page?: number): void {
     this.isLoading.set(true);
     this.error.set(null);
 
     forkJoin({
       genres: this.cinemaService.getGenres(),
-      trending: this.cinemaService.getTrending(this.timeWindow())
+      trending: this.cinemaService.getTrending(this.timeWindow(), page)
     }).subscribe({
       next: ({ trending }) => {
         this.movies.set(trending);
+        this.currentPage.set(this.cinemaService.trendingPage());
+        this.totalPages.set(this.cinemaService.trendingTotalPages());
         this.isLoading.set(false);
         console.log('Películas en tendencia cargadas:', trending);
       },
@@ -56,7 +61,17 @@ export class TrendingComponent implements OnInit {
   toggleTimeWindow(): void {
     const newTimeWindow = this.timeWindow() === 'day' ? 'week' : 'day';
     this.timeWindow.set(newTimeWindow);
-    this.loadData();
+    this.currentPage.set(1); // Resetear a la primera página
+    this.loadData(1);
+  }
+
+  /**
+   * Maneja el cambio de página
+   */
+  onPageChange(page: number): void {
+    this.loadData(page);
+    // Scroll hacia arriba para mejor UX
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /**
