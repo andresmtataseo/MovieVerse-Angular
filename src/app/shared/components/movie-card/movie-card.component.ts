@@ -1,5 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Movie } from '../../interfaces/movie.interface';
 import { CinemaService } from '../../services/cinema.service';
 import { Genre } from '../../interfaces/genre.interface';
@@ -16,7 +17,8 @@ export class MovieCardComponent {
   showPlayButton = input<boolean>(false);    // Mostrar botón de play (opcional)
   showIcons = input<boolean>(false);         // Mostrar iconos adicionales (opcional)
 
-  // Inyección del servicio para acceder a los géneros
+  // Inyección de servicios
+  private readonly router = inject(Router);
   genres = inject(CinemaService).genres;
 
   /**
@@ -63,6 +65,13 @@ export class MovieCardComponent {
       half: hasHalfStar,
       empty: emptyStars
     };
+  }
+
+  /**
+   * Navega a la página de detalles de la película
+   */
+  navigateToDetails(): void {
+    this.router.navigate(['/details-movie', this.movie().id]);
   }
 
   /**

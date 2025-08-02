@@ -6,6 +6,7 @@ import { catchError, delay, map, Observable, tap, throwError } from 'rxjs';
 import { MovieMapper } from '../interfaces/mappers/movie.mapper';
 import { Movie } from '../interfaces/movie.interface';
 import { Genre, GenreResponse } from '../interfaces/genre.interface';
+import { MovieDetails } from '../interfaces/movie-details.interface';
 
 /**
  * Servicio principal para la comunicación con la API de TMDB
@@ -149,35 +150,61 @@ export class CinemaService {
   }
 
   /**
-   * Obtiene las películas en tendencia (día o semana)
-   *
-   * @param timeWindow - Período de tiempo: 'day' para día, 'week' para semana
-   * @returns Observable con la lista de películas en tendencia transformadas
+   * Obtiene las películas en tendencia (diarias o semanales)
+   * @param timeWindow - 'day' para tendencias diarias, 'week' para semanales
+   * @returns Observable con las películas en tendencia
    */
-  getTrending(timeWindow?: 'day' | 'week'): Observable<Movie[]> {
-    const period = timeWindow ?? this.trendingTimeWindow();
-    const url = `${environment.apiUrl}/trending/movie/${period}`;
+  getTrending(timeWindow: 'day' | 'week' = 'day'): Observable<Movie[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${environment.token}`,
+      'accept': 'application/json'
+    });
 
-    // Headers con token de autorización
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${environment.token}`);
-
-    // Parámetros: idioma localizado
     const params = new HttpParams()
       .set('language', 'es-MX');
 
-    return this.http.get<RESTNowPlaying>(url, { headers, params })
+    return this.http.get<RESTNowPlaying>(`${environment.apiUrl}/trending/movie/${timeWindow}`, { headers, params })
       .pipe(
-        // Actualiza el estado del período de tiempo actual
-        tap(() => this.trendingTimeWindow.set(period)),
-        // Simula delay para mostrar loading (solo para demo)
-        delay(1000),
-        // Transforma las películas usando el mapper
-        map((response) => MovieMapper.mapTMDBMoviesToMovies(response.results)),
-        // Manejo de errores
-        catchError((error) => {
-          console.error(error);
-          return throwError(() => new Error('No se pudo obtener las películas en tendencia'));
+        delay(1000), // Delay para demostración
+        tap(() => this.trendingTimeWindow.set(timeWindow)),
+        map(response => response.results.map(movie => MovieMapper.mapTMDBMovieToMovie(movie))),
+        catchError(error => {
+          console.error('Error al obtener películas en tendencia:', error);
+          return throwError(() => new Error('Error al cargar las películas en tendencia'));
+        })
+      );
+  }
+
+  /**
+   * Obtiene los detalles completos de una película por su ID
+   * @param movieId - ID de la película
+   * @returns Observable con los detalles completos de la película
+   */
+  getMovieDetails(movieId: number): Observable<MovieDetails> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${environment.token}`,
+      'accept': 'application/json'
+    });
+
+    const params = new HttpParams()
+      .set('language', 'es-MX');
+
+    return this.http.get<MovieDetails>(`${environment.apiUrl}/movie/${movieId}`, { headers, params })
+      .pipe(
+        delay(1000), // Delay para demostración
+        map(movieDetails => ({
+          ...movieDetails,
+          // Construir URLs completas para las imágenes
+          poster_path: movieDetails.poster_path ? `${environment.imageUrl}${movieDetails.poster_path}` : null,
+          backdrop_path: movieDetails.backdrop_path ? `${environment.imageUrl}${movieDetails.backdrop_path}` : null,
+          production_companies: movieDetails.production_companies.map(company => ({
+            ...company,
+            logo_path: company.logo_path ? `${environment.imageUrl}${company.logo_path}` : null
+          }))
+        })),
+        catchError(error => {
+          console.error('Error al obtener detalles de la película:', error);
+          return throwError(() => new Error('Error al cargar los detalles de la película'));
         })
       );
   }
