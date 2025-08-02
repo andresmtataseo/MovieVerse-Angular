@@ -162,22 +162,23 @@
 
           <!-- Production Companies -->
           <div *ngIf="movieDetails()!.production_companies.length > 0">
-            <h3 class="text-lg font-semibold mb-3">Compañías de Producción</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <h3 class="text-lg font-semibold mb-4">Compañías de Producción</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               <div *ngFor="let company of movieDetails()!.production_companies" 
-                   class="card bg-base-200 shadow-sm">
+                   class="card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <div class="card-body p-4">
-                  <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                      <div class="w-12 h-12 rounded bg-base-300 flex items-center justify-center">
-                        <img *ngIf="company.logo_path" 
-                             [src]="company.logo_path" 
-                             [alt]="company.name"
-                             (error)="onImageError($event)"
-                             class="w-8 h-8 object-contain" />
-                        <svg *ngIf="!company.logo_path" 
-                             xmlns="http://www.w3.org/2000/svg" 
-                             class="h-6 w-6 text-base-content/50" 
+                  <!-- Logo Container -->
+                  <div class="flex justify-center mb-3">
+                    <div class="w-20 h-20 bg-white rounded-lg shadow-sm flex items-center justify-center p-2">
+                      <img *ngIf="company.logo_path" 
+                           [src]="company.logo_path" 
+                           [alt]="company.name"
+                           (error)="onCompanyLogoError($event)"
+                           class="max-w-full max-h-full object-contain" />
+                      <div *ngIf="!company.logo_path" 
+                           class="w-full h-full flex items-center justify-center bg-base-300 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="h-8 w-8 text-base-content/40" 
                              fill="none" 
                              viewBox="0 0 24 24" 
                              stroke="currentColor">
@@ -185,10 +186,16 @@
                         </svg>
                       </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="font-medium text-sm truncate">{{ company.name }}</p>
-                      <p class="text-xs text-base-content/70">{{ company.origin_country }}</p>
-                    </div>
+                  </div>
+                  
+                  <!-- Company Info -->
+                  <div class="text-center">
+                    <p class="font-medium text-sm leading-tight mb-1" [title]="company.name">
+                      {{ company.name }}
+                    </p>
+                    <p class="text-xs text-base-content/70 uppercase tracking-wide">
+                      {{ company.origin_country }}
+                    </p>
                   </div>
                 </div>
               </div>

@@ -110,10 +110,35 @@ export class DetailsMovieComponent implements OnInit {
   }
 
   /**
-   * Maneja errores de carga de imágenes
+   * Maneja errores de carga de imágenes generales
    */
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.src = '/placeholder-movie.svg';
+  }
+
+  /**
+   * Maneja errores de carga de logos de compañías de producción
+   */
+  onCompanyLogoError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    // Ocultar la imagen y mostrar el placeholder SVG
+    img.style.display = 'none';
+    
+    // Buscar el contenedor padre y agregar una clase para mostrar el placeholder
+    const container = img.closest('.w-20.h-20');
+    if (container) {
+      container.innerHTML = `
+        <div class="w-full h-full flex items-center justify-center bg-base-300 rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+               class="h-8 w-8 text-base-content/40" 
+               fill="none" 
+               viewBox="0 0 24 24" 
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+      `;
+    }
   }
 }
